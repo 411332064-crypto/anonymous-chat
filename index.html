@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Ranunculus Hall：不用登入的匿名聊天室。">
+  <title>Ranunculus Hall</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%236B1F2A'/%3E%3Ctext x='16' y='24' font-size='22' text-anchor='middle' fill='%23F3ECE0' font-family='serif'%3E%E2%9D%A7%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- 字體在背景載入：網路慢的時候先用系統字，聊天室不用等字體下載完就能用 -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Noto+Serif+TC:wght@400;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Noto+Serif+TC:wght@400;600&display=swap"></noscript>
+  <!-- 用相對路徑：網站放在 /anonymous-chat/ 底下，開頭不能加 / -->
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+
+  <!-- 進入畫面 -->
+  <section class="entry screen" id="entry-screen" aria-labelledby="entry-title">
+    <div class="demo-banner" id="demo-banner" role="note" hidden>目前是展示模式，其他人都是模擬的</div>
+    <div class="entry__body">
+      <form class="invite" id="entry-form" novalidate>
+        <span class="invite__orn" aria-hidden="true">❧</span>
+        <svg class="invite__candle" aria-hidden="true" width="22" height="34" viewBox="0 0 22 34"><path class="candle__flame" d="M11 2 C15 7, 15 11, 11 14 C7 11, 7 7, 11 2 Z"></path><path d="M11 14 V17"></path><path d="M6 17 H16 V31 H6 Z"></path><path d="M3 32 H19"></path></svg>
+        <p class="invite__sub" lang="fr">après l'hiver</p>
+        <h1 class="invite__title" id="entry-title" lang="en">Ranunculus Hall</h1>
+        <p class="invite__lede">冬天過後的舊舞廳，<br>留一盞燈給晚到的人。</p>
+        <svg class="flourish" aria-hidden="true" width="180" height="14" viewBox="0 0 180 14"><path d="M0 7 H68"></path><path d="M112 7 H180"></path><path d="M74 7 C79 0, 86 0, 90 7 C94 14, 101 14, 106 7"></path><circle cx="90" cy="7" r="1.6"></circle></svg>
+
+        <div class="field">
+          <label class="field__label" for="nickname">你的代號</label>
+          <input class="field__input" id="nickname" name="nickname" type="text" autocomplete="nickname" enterkeyhint="go" spellcheck="false">
+          <p class="field__hint">1～20 個字，可以和別人重複</p>
+        </div>
+
+        <button class="btn btn--primary btn--wide" id="enter-button" type="submit" disabled>進入</button>
+
+        <div class="alert" id="entry-error" role="alert" hidden>
+          <p class="alert__text">無法連線，請稍後再試</p>
+          <button class="btn btn--outline" id="retry-button" type="button">重試</button>
+        </div>
+
+        <p class="invite__foot">不必登入 · 不留任何紀錄</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- 聊天室畫面 -->
+  <section class="chat screen" id="chat-screen" aria-label="聊天室" hidden>
+    <header class="topbar">
+      <div class="topbar__brand">
+        <span class="topbar__orn" aria-hidden="true">❧</span>
+        <h1 class="topbar__title" lang="en">Ranunculus Hall</h1>
+        <span class="topbar__sub" lang="fr">après l'hiver</span>
+      </div>
+      <p class="topbar__who">你的代號：<span class="topbar__name" id="self-name"></span></p>
+      <button class="btn btn--outline topbar__leave" id="leave-button" type="button">離開</button>
+    </header>
+
+    <div class="conn-banner" id="conn-banner" role="status" hidden>
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M8 2 A6 6 0 1 1 2.8 5"></path><path d="M2.5 1.8 V5.2 H5.9"></path></svg>
+      <span>連線中斷，正在重新連線…</span>
+    </div>
+
+    <section class="roster" aria-labelledby="roster-count">
+      <div class="roster__head">
+        <span class="roster__orn" aria-hidden="true">❧</span>
+        <span class="roster__title">在場的人</span>
+        <span class="roster__count" id="roster-count">線上 0 人</span>
+      </div>
+      <ul class="roster__list" id="roster-list"></ul>
+      <p class="roster__foot">不必登入 · 不留任何紀錄</p>
+    </section>
+
+    <div class="log-wrap">
+      <div class="log" id="log" role="log" aria-label="訊息" tabindex="0"></div>
+      <div class="empty" id="empty-state">
+        <svg class="flourish flourish--small" aria-hidden="true" width="120" height="14" viewBox="0 0 120 14"><path d="M0 7 H44"></path><path d="M76 7 H120"></path><circle cx="60" cy="7" r="2"></circle></svg>
+        <span class="empty__orn" aria-hidden="true">❧</span>
+        <p class="empty__text">還沒有人說話，打個招呼吧</p>
+        <svg class="flourish flourish--small" aria-hidden="true" width="120" height="14" viewBox="0 0 120 14"><path d="M0 7 H44"></path><path d="M76 7 H120"></path><circle cx="60" cy="7" r="2"></circle></svg>
+      </div>
+      <button class="new-pill" id="new-pill" type="button" hidden>
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14"><path d="M7 2 V12"></path><path d="M3 8 L7 12 L11 8"></path></svg>
+        <span id="new-pill-text">有 1 則新訊息</span>
+      </button>
+    </div>
+
+    <form class="composer" id="composer" novalidate>
+      <div class="composer__status" id="composer-status" hidden>
+        <p class="composer__rate" id="rate-notice" role="status" hidden>
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5"></circle><path d="M7 4 V7 L9 8.5"></path></svg>
+          送太快了，稍等一下
+        </p>
+        <p class="composer__count" id="char-count" hidden></p>
+      </div>
+      <div class="composer__row">
+        <label class="visually-hidden" for="message-input">訊息</label>
+        <textarea class="composer__input" id="message-input" rows="1" placeholder="寫一張短箋…" enterkeyhint="enter"></textarea>
+        <button class="btn btn--primary composer__send" id="send-button" type="submit" disabled>送出</button>
+      </div>
+      <p class="composer__hint">Enter 送出 · Shift+Enter 換行</p>
+    </form>
+  </section>
+
+  <!-- 底片顆粒和暗角，只是裝飾，不會擋住點擊 -->
+  <div class="vignette" aria-hidden="true"></div>
+  <svg class="grain" aria-hidden="true" width="100%" height="100%"><filter id="grain-filter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#grain-filter)"></rect></svg>
+
+  <noscript><p class="noscript">這個聊天室需要開啟 JavaScript 才能使用。</p></noscript>
+</body>
+</html>
