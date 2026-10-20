@@ -93,7 +93,7 @@ Supabase 有很多功能（資料庫、登入、檔案儲存…），這個專�
 - **不用的功能**：Database（資料庫）、Auth（登入）、Storage（檔案）、Edge Functions（雲端程式）。
 
 ### 3.5 Supabase 程式庫：從 CDN 載入，鎖定固定版本
-- **選了什麼**：用 Supabase 官方的 JavaScript 程式庫 `@supabase/supabase-js`，從 jsDelivr CDN 載入，網址裡寫死一個確切的版本號（例如 `@supabase/supabase-js@2.45.4`，實作時再選一個當時穩定的版本）。
+- **選了什麼**：用 Supabase 官方的 JavaScript 程式庫 `@supabase/supabase-js`，從 jsDelivr CDN 載入，網址裡寫死一個確切的版本號（目前是 `@supabase/supabase-js@2.117.2`）。
 - **為什麼**：不用安裝任何東西。版本寫死的話，官方出新版也不會突然把我們的網站弄壞。
 
 ### 3.6 其他小選擇
